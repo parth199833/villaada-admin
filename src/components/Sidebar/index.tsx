@@ -177,7 +177,7 @@ const menuGroups = [
           </svg>
         ),
         label: "Booking Form",
-        route: "/booking-form",
+        route: "/booking-main",
       },
     ],
   },
