@@ -3,7 +3,7 @@
 * @type {string[]}
 */
 
-export const publicRoutes = ["/"];
+export const publicRoutes = ["/","/api/register"];
 
 /*
  Array of routes that is used for authentication

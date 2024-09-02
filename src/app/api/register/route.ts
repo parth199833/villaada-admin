@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import dbConnect from "@/lib/mongodb";
+import  { getDb } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    await dbConnect(); // Ensure MongoDB connection is established
-
-    const { name, email, password } = await request.json();
+  const db=await getDb(); // Ensure MongoDB connection is established
+  const { name, email, password,roleType,fullName} = await request.json();
 
     // Validate input
     if (!name || !email || !password) {
@@ -19,7 +18,6 @@ export async function POST(request: Request) {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const db = await dbConnect();
     const collection = db.collection("users"); // Replace 'users' with your collection name
 
     // Check if user already exists
@@ -36,6 +34,8 @@ export async function POST(request: Request) {
       name,
       email,
       password: hashedPassword,
+      roleType:roleType,
+      fullName:fullName
     });
 
     // Retrieve the created user

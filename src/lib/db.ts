@@ -1,37 +1,28 @@
-// This approach is taken from https://github.com/vercel/next.js/tree/canary/examples/with-mongodb
-import { MongoClient, ServerApiVersion } from "mongodb";
+// lib/mongodb.ts
+import { MongoClient, Db } from 'mongodb';
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
-}
+// Replace with your MongoDB URI
+const uri: string = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const client: MongoClient = new MongoClient(uri, {});
 
-const uri = process.env.MONGODB_URI;
-const options = {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
+let db: Db;
+
+export const connectToDatabase = async () => {
+  if (db) return db;
+  try {
+    await client.connect();
+    console.log('Connected to MongoDB');
+    db = client.db('villaada'); // Replace with your database name
+    return db;
+  } catch (error) {
+    console.error('Error connecting to MongoDB', error);
+    throw error;
+  }
 };
 
-let mongoClient: MongoClient;
-
-if (process.env.NODE_ENV === "development") {
-  // In development mode, use a global variable so that the value
-  // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  let globalWithMongo = global as typeof globalThis & {
-    _mongoClient?: MongoClient;
-  };
-
-  if (!globalWithMongo._mongoClient) {
-    globalWithMongo._mongoClient = new MongoClient(uri, options);
+export const getDb = async (): Promise<Db> => {
+  if (!db) {
+    await connectToDatabase();
   }
-  mongoClient = globalWithMongo._mongoClient;
-} else {
-  // In production mode, it's best to not use a global variable.
-  mongoClient = new MongoClient(uri, options);
-}
-
-// Export a module-scoped MongoClient. By doing this in a
-// separate module, the client can be shared across functions.
-export default mongoClient;
+  return db;
+};

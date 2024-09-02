@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import dbConnect from "@/lib/mongodb"; // Adjust the path according to your project structure
-
+import { getDb } from "@/lib/db";
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"; // Replace with an environment variable in production
 
 export async function POST(request: Request) {
-  await dbConnect(); // Ensure MongoDB connection is established
-
+ 
   const { email, password }: { email: string; password: string } =
     await request.json();
 
-  const db = await dbConnect();
+  const db = await getDb();
   const collection = db.collection("users"); // Replace 'users' with your collection name
 
   // Find user by email
